@@ -32,7 +32,7 @@ repeat wait() until game:IsLoaded()
 
 -- 🪟 Cửa sổ chính
 local Window = Fluent:CreateWindow({
-	Title = "HKTVIPPRO😏",         -- 👈 đổi thành tên script của bạn
+	Title = " hoanganhvip",         -- 👈 đổi thành tên script của bạn
 	SubTitle = "vip pro💎😍",              -- 👈 đổi mô tả phụ
 	TabWidth = 157,
 	Size = UDim2.fromOffset(450, 300),
@@ -43,9 +43,13 @@ local Window = Fluent:CreateWindow({
 
 -- 📑 Các tab (mục chính)
 local Tabs = {
-	Main0 = Window:AddTab({ Title = "ADMIN" }),  -- 👈 đổi tên tab 1
-	Main1 = Window:AddTab({ Title = "BROOKHAVEN" }),  -- 👈 đổi tên tab 2
-	Main2 = Window:AddTab({ Title = "TROLL" }),     -- 👈 đổi tên tab 3
+	Main0 = Window:AddTab({ Title = "brookhaven" }),  -- 👈 đổi tên tab 1
+	Main1 = Window:AddTab({ Title = "brookhaven" }),  -- 👈 đổi tên tab 2
+	Main2 = Window:AddTab({ Title = "bran rót💩" }),     -- 👈 đổi tên tab 3
+	Main3 = Window:AddTab({ Title = "99 đêm🥷" }),        -- 👈 đổi tên tab 4
+	Main4 = Window:AddTab({ Title = "blox fruit🍎" }),    -- 👈 đổi tên tab 5
+	Main5 = Window:AddTab({ Title = "plan vs branro🌲🐘t" }) -- 👈 đổi tên tab 6
+}
 
 ------------------------------------------------
 -- TAB 1: Các kênh tiktok
@@ -88,7 +92,6 @@ Tabs.Main1:AddButton({
 		loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Coquette-Hub-Remake-133562"))() -- 👈 link script tải
 	end
 })
-
 Tabs.Main1:AddButton({
 	Title = "kitk4t",                             -- 👈 tên nút hiển thị
 	Description = "script này ngon á đủ chức năng cả😃",-- 👈 mô tả
@@ -100,7 +103,6 @@ Tabs.Main1:AddButton({
 		loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-KitK4t-Hub-137923"))() -- 👈 link script tải
 	end
 })
-
 Tabs.Main1:AddButton({
 	Title = "sandeXY",                             -- 👈 tên nút hiển thị
 	Description = "script này ngon á đủ chức năng cả😃",-- 👈 mô tả
@@ -112,3 +114,4 @@ Tabs.Main1:AddButton({
 		loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Sander-XY-35845"))() -- 👈 link script tải
 	end
 })
+
