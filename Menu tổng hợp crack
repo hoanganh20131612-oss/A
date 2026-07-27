@@ -1,0 +1,302 @@
+-- ==========================================
+-- XÓA UI CŨ TRÁNH ĐÈ GIAO DIỆN
+-- ==========================================
+if game.CoreGui:FindFirstChild("Rayfield") then game.CoreGui.Rayfield:Destroy() end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local StartTime = tick()
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local VirtualUser = game:GetService("VirtualUser")
+
+-- ==========================================
+-- BIẾN HỆ THỐNG GLOBAL (CŨ)
+-- ==========================================
+_G.Speed = 16 _G.Jump = 50 _G.NoClip = false _G.AntiAFK = true _G.ESP = false _G.NoBatidao = false _G.MusicID = ""
+_G.FollowPlayer = false _G.InfJump = false _G.LowGrav = false _G.OrbitActive = false _G.OrbitCenter = nil 
+_G.FOV = false _G.XRay = false _G.NoFog = false _G.AutoSpeed = false _G.AutoJump = false _G.AntiPaused = false
+_G.PreOrbitPosition = nil       
+_G.Invisible = false            
+_G.GhostVisual = false          
+_G.FollowMode = "Behind"        
+_G.FollowDistance = 5           
+_G.TargetPlayer = "None"
+_G.AntiFling = false _G.ClickTP = false _G.AnchorChar = false _G.AntiRagdoll = false _G.NoSit = false
+_G.MagicCarpet = false _G.Spinbot = false _G.AutoRun = false
+_G.WalkOnWater = false
+_G.InfOxygen = false
+_G.WallClimb = false
+_G.FloatChar = false
+_G.RainbowChar = false
+_G.CustomGravity = 196.2
+_G.CustomFOV = 70
+
+-- ==========================================
+-- BIẾN HỆ THỐNG MỚI (V6.0)
+-- ==========================================
+_G.Bhop = false
+_G.HitboxExpander = false
+_G.HitboxSize = 10
+_G.ShowHitbox = false
+_G.AltDelete = false
+_G.ChatSpam = false
+_G.SpamText = "Ultimate Master Hub V6.0 is the best!"
+_G.AntiVoid = false
+_G.AirWalk = false
+_G.NativeAutoClick = false
+_G.AutoBringTools = false
+_G.DisableShadows = false
+_G.DayTimeOnly = false
+_G.NightTimeOnly = false
+_G.CamMaxZoom = false
+_G.AntiBlind = false
+_G.AlwaysDay = false
+_G.Spectating = false
+_G.SpectateTarget = nil
+
+local airWalkPart = nil
+
+-- ==========================================
+-- CÁC HÀM HỖ TRỢ
+-- ==========================================
+local function RefreshXRay()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and not v:IsDescendantOf(LocalPlayer.Character) then
+            v.LocalTransparencyModifier = _G.XRay and 0.5 or 0
+        end
+    end
+end
+workspace.DescendantAdded:Connect(function(v)
+    if _G.XRay and v:IsA("BasePart") and not v:IsDescendantOf(LocalPlayer.Character) then
+        v.LocalTransparencyModifier = 0.5
+    end
+end)
+Lighting:GetPropertyChangedSignal("FogEnd"):Connect(function()
+    if _G.NoFog then Lighting.FogEnd = 100000 end
+end)
+
+local function ClearESP()
+    for _, p in pairs(Players:GetPlayers()) do
+        if p.Character then
+            local hl = p.Character:FindFirstChild("ESPHighlight")
+            if hl then hl:Destroy() end
+            if p.Character:FindFirstChild("Head") then
+                local tag = p.Character.Head:FindFirstChild("ESPTag")
+                if tag then tag:Destroy() end
+            end
+        end
+    end
+end
+
+-- ==========================================
+-- KHỞI TẠO MENU CHÍNH
+-- ==========================================
+local Window = Rayfield:CreateWindow({
+    Name = "Ultimate Master Hub | Full Pro V6.0",
+    LoadingTitle = "Ultimate Master Hub Loading...",
+    LoadingSubtitle = "by RINHKT | Đã Thêm Nguyên 20 Chức Năng Mới",
+    ConfigurationSaving = { Enabled = true, FileName = "UltimateHubConfig" }
+})
+
+-- 1. ABOUT TAB
+local AboutTab = Window:CreateTab("About", "info")
+AboutTab:CreateLabel("Script: Ultimate Master Hub Pro 6.0")
+AboutTab:CreateParagraph({
+    Title = "Siêu Bản Cập Nhật V6.0", 
+    Content = "Giữ nguyên 100% V5.0 và thêm hẳn 1 tab V6.0 với 20 tính năng hoàn toàn mới (Bhop, BTools, Hitbox, Spam, Anti-Void, AirWalk...). Không mất 1 chức năng nào!\n\n💖 Chúc bạn chơi game thật vui vẻ, luôn may mắn và có những giây phút giải trí tuyệt vời nhất cùng Ultimate Master Hub nhé!"
+})
+
+-- 2. GAME TAB
+local GameTab = Window:CreateTab("Game", "gamepad")
+GameTab:CreateSection("Blox Fruits")
+GameTab:CreateButton({Name = "⚡ Redz Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))() end) end})
+GameTab:CreateButton({Name = "🥥 Hoho Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawusercontent.com/acsu123/HOHO_H/main/Script/BloxFruits.lua"))() end) end})
+GameTab:CreateButton({Name = "🐻 Bear Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Huyscript/refs/heads/main/newscript.txt"))() end) end})
+GameTab:CreateButton({Name = "🌲 Tung Nam Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))() end) end})
+GameTab:CreateButton({Name = "🍌 Nana Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"))() end) end})
+GameTab:CreateButton({Name = "💥 NHT X HUB", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"))() end) end})
+
+GameTab:CreateSection("King Legacy")
+GameTab:CreateButton({Name = "🔥 Spectrum Hub", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/spectrumxx/mainfarm/refs/heads/main/loader.lua"))() end) end})
+
+GameTab:CreateSection("Các Game Khác")
+GameTab:CreateButton({Name = "🏠 Brookhaven (Reviz)", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/dady-hax/Reviz/main/Brookhaven"))() end) end})
+GameTab:CreateButton({Name = "🏠 Brookhaven (Blacktrap)", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Blacktrap-Hub/Blacktrap-Hub/main/Brookhaven"))() end) end})
+GameTab:CreateButton({Name = "🌱 Grow a Garden 2", Callback = function() pcall(function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/795c7accd08487171484e54a92e75c77.lua"))() end) end})
+GameTab:CreateButton({Name = "🌀 Fling Things & People", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Fling-Things-and-People-FTAP-Hub-79081"))() end) end})
+GameTab:CreateButton({Name = "⚔️ Forsaken Plus", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Forsaken-Plus-216770"))() end) end})
+GameTab:CreateButton({Name = "⚙️ GTD (Go To Date)", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Game-Time-Date-12345"))() end) end})
+
+GameTab:CreateSection("Admin / Tools")
+GameTab:CreateButton({Name = "♾️ Infinite Yield", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))() end) end})
+GameTab:CreateButton({Name = "💻 Cmd-X", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source"))() end) end})
+GameTab:CreateButton({Name = "💎 Dex Explorer", Callback = function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua"))() end) end})
+
+-- 3. SCRIPT KEYS TAB
+local KeyTab = Window:CreateTab("Script Keys", "key")
+KeyTab:CreateSection("Key Required Scripts")
+KeyTab:CreateButton({ Name = "🔑 Real Kid Hub (Blox Fruits)", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))() end) end })
+
+-- 4. PLAYER TAB
+local PlayerTab = Window:CreateTab("Player", "user")
+
+PlayerTab:CreateSection("--- 🆕 [ BẢN V5.0 ] 10 Chức Năng Mới Thêm ---")
+PlayerTab:CreateToggle({ Name = "🌊 Đi trên mặt nước (Walk on Water)", Callback = function(v) _G.WalkOnWater = v end })
+PlayerTab:CreateToggle({ Name = "🫁 Vô hạn Oxy (Chống chết đuối)", Callback = function(v) _G.InfOxygen = v end })
+PlayerTab:CreateToggle({ Name = "🧗 Leo tường thẳng đứng (Wall Climb)", Callback = function(v) _G.WallClimb = v end })
+PlayerTab:CreateToggle({ Name = "🎈 Trôi nổi trên không (Float/Hover)", Callback = function(v) _G.FloatChar = v end })
+PlayerTab:CreateToggle({ Name = "🌈 Nhân vật Cầu Vồng (Rainbow Body)", Callback = function(v) _G.RainbowChar = v end })
+PlayerTab:CreateButton({ Name = "🎲 Dịch chuyển đến Người chơi Ngẫu nhiên", Callback = function() 
+    local allP = Players:GetPlayers()
+    if #allP > 1 then
+        local rP = allP[math.random(1, #allP)]
+        while rP == LocalPlayer do rP = allP[math.random(1, #allP)] end
+        if rP.Character and rP.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = rP.Character.HumanoidRootPart.CFrame
+        end
+    end
+end })
+PlayerTab:CreateButton({ Name = "🎩 Xóa phụ kiện nón/tóc (Fix Lag Mobile)", Callback = function() 
+    if LocalPlayer.Character then
+        for _, v in pairs(LocalPlayer.Character:GetChildren()) do if v:IsA("Accessory") then v:Destroy() end end
+    end
+end })
+PlayerTab:CreateButton({ Name = "🧎 Ép nhân vật ngồi xuống đất", Callback = function() if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.Sit = true end end })
+PlayerTab:CreateInput({ Name = "🌍 Nhập Trọng Lực tùy chỉnh", PlaceholderText = "196.2", Callback = function(v) _G.CustomGravity = tonumber(v) or 196.2 workspace.Gravity = _G.CustomGravity end })
+PlayerTab:CreateInput({ Name = "👁️ Nhập FOV tầm nhìn tùy chỉnh", PlaceholderText = "70", Callback = function(v) _G.CustomFOV = tonumber(v) or 70 workspace.CurrentCamera.FieldOfView = _G.CustomFOV end })
+
+PlayerTab:CreateSection("--- 🛡️ [ BẢN V4.0 ] 10 Chức Năng Cũ ---")
+PlayerTab:CreateToggle({ Name = "🛡️ Chống bị Fling", Callback = function(v) _G.AntiFling = v end })
+PlayerTab:CreateToggle({ Name = "🖱️ Click TP (Nhấn giữ & Chạm)", Callback = function(v) _G.ClickTP = v end })
+PlayerTab:CreateToggle({ Name = "🧊 Đóng băng (Chống bị đẩy)", Callback = function(v) _G.AnchorChar = v end })
+PlayerTab:CreateToggle({ Name = "🧍‍♂️ Chống ngã (Anti-Ragdoll)", Callback = function(v) _G.AntiRagdoll = v end })
+PlayerTab:CreateToggle({ Name = "🪑 Chống ngồi (No Sit)", Callback = function(v) _G.NoSit = v end })
+PlayerTab:CreateToggle({ Name = "🛸 Thảm bay ảo", Callback = function(v) _G.MagicCarpet = v end })
+PlayerTab:CreateToggle({ Name = "🌀 Spinbot (Né skill)", Callback = function(v) _G.Spinbot = v end })
+PlayerTab:CreateToggle({ Name = "🏃 Tự động chạy thẳng", Callback = function(v) _G.AutoRun = v end })
+PlayerTab:CreateButton({ Name = "⚡ Flash Step (Lướt 50 Studs)", Callback = function() local c = LocalPlayer.Character if c and c:FindFirstChild("HumanoidRootPart") then c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame * CFrame.new(0, 0, -50) end end })
+PlayerTab:CreateButton({ Name = "💀 Tự sát nhanh (Reset)", Callback = function() local c = LocalPlayer.Character if c and c:FindFirstChild("Humanoid") then c.Humanoid.Health = 0 end end })
+
+PlayerTab:CreateSection("--- ⚙️ Tính Năng Player Cơ Bản ---")
+PlayerTab:CreateButton({ Name = "🚀 Better Fly (External)", Callback = function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Better-Fly-GUI-44304"))() end) end })
+PlayerTab:CreateToggle({ Name = "Auto Speed", Callback = function(v) _G.AutoSpeed = v if not v and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.WalkSpeed = 16 end end })
+PlayerTab:CreateInput({ Name = "Set Speed Value", PlaceholderText = "16", Callback = function(v) _G.Speed = tonumber(v) or 16 end })
+PlayerTab:CreateToggle({ Name = "Auto Jump Power (Force Fly Up)", Callback = function(v) _G.AutoJump = v end })
+PlayerTab:CreateInput({ Name = "Set Jump Value", PlaceholderText = "50", Callback = function(v) _G.Jump = tonumber(v) or 50 end })
+PlayerTab:CreateToggle({ Name = "Invisible (Tàng hình + Ẩn bảng tên)", Callback = function(v) 
+    _G.Invisible = v 
+    if not v and LocalPlayer.Character then
+        if LocalPlayer.Character:FindFirstChild("Humanoid") then LocalPlayer.Character.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer end
+        for _, p in pairs(LocalPlayer.Character:GetDescendants()) do if (p:IsA("BasePart") and p.Name ~= "HumanoidRootPart") or p:IsA("Decal") then p.Transparency = 0 end end
+    end
+end })
+PlayerTab:CreateToggle({ Name = "No Batidao", Callback = function(v) _G.NoBatidao = v end })
+PlayerTab:CreateToggle({ Name = "Noclip", Callback = function(v) _G.NoClip = v end })
+PlayerTab:CreateToggle({ Name = "Infinite Jump", Callback = function(v) _G.InfJump = v end })
+PlayerTab:CreateToggle({ Name = "Low Gravity", Callback = function(v) _G.LowGrav = v workspace.Gravity = v and 50 or 196.2 end })
+
+-- ==========================================
+-- 🚀 NEW TAB: V6.0 SUPER FEATURES
+-- ==========================================
+local V6Tab = Window:CreateTab("V6.0 Extras", "star")
+V6Tab:CreateSection("--- 💎 Chức Năng Hỗ Trợ Đỉnh Cao ---")
+
+V6Tab:CreateToggle({ Name = "1. Thỏ Nhảy (Bunny Hop tự động)", Callback = function(v) _G.Bhop = v end })
+V6Tab:CreateButton({ Name = "2. Cấp quyền F3X (Building Tools)", Callback = function() 
+    pcall(function() loadstring(game:GetObjects("rbxassetid://2255784735")[1].Source)() end)
+    pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/f3x.lua"))() end)
+end })
+V6Tab:CreateButton({ Name = "3. Xóa toàn bộ Texture (Tăng Max FPS)", Callback = function() 
+    for _, v in pairs(workspace:GetDescendants()) do 
+        if v:IsA("Texture") or v:IsA("Decal") then v:Destroy() end 
+        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic end 
+    end 
+end })
+
+V6Tab:CreateToggle({ Name = "4. Mở rộng Hitbox Người Chơi Khác", Callback = function(v) 
+    _G.HitboxExpander = v 
+    if not v then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                p.Character.HumanoidRootPart.Size = Vector3.new(2, 2, 1)
+                p.Character.HumanoidRootPart.Transparency = 1
+                p.Character.HumanoidRootPart.Material = Enum.Material.Plastic
+            end
+        end
+    end
+end })
+V6Tab:CreateInput({ Name = "5. Chỉnh kích thước Hitbox (Mặc định 10)", PlaceholderText = "10", Callback = function(v) _G.HitboxSize = tonumber(v) or 10 end })
+V6Tab:CreateToggle({ Name = "6. Hiển thị Hitbox (Trong suốt)", Callback = function(v) _G.ShowHitbox = v end })
+
+V6Tab:CreateToggle({ Name = "7. Giữ phím 'Alt' + Click trái để xóa Part", Callback = function(v) _G.AltDelete = v end })
+V6Tab:CreateToggle({ Name = "8. Bật Spam Kênh Chat", Callback = function(v) _G.ChatSpam = v end })
+V6Tab:CreateInput({ Name = "9. Nhập nội dung Spam", PlaceholderText = "Nội dung...", Callback = function(v) _G.SpamText = v end })
+
+V6Tab:CreateInput({ Name = "10. Theo dõi (Spectate) - Nhập Tên", PlaceholderText = "Tên người chơi...", Callback = function(v) 
+    for _, p in pairs(Players:GetPlayers()) do 
+        if string.sub(string.lower(p.Name), 1, string.len(v)) == string.lower(v) then 
+            _G.SpectateTarget = p workspace.CurrentCamera.CameraSubject = p.Character.Humanoid _G.Spectating = true return 
+        end 
+    end 
+end })
+V6Tab:CreateButton({ Name = "11. Ngừng theo dõi (Unspectate)", Callback = function() 
+    _G.Spectating = false _G.SpectateTarget = nil workspace.CurrentCamera.CameraSubject = LocalPlayer.Character.Humanoid 
+end })
+
+V6Tab:CreateButton({ Name = "12. Copy Tọa Độ Bản Thân", Callback = function() 
+    if LocalPlayer.Character and setclipboard then 
+        local pos = LocalPlayer.Character.HumanoidRootPart.Position 
+        setclipboard(tostring(pos.X) .. ", " .. tostring(pos.Y) .. ", " .. tostring(pos.Z)) 
+    end 
+end })
+V6Tab:CreateInput({ Name = "13. Dịch chuyển ngay tới Tên Người Chơi", PlaceholderText = "Tên...", Callback = function(v) 
+    for _, p in pairs(Players:GetPlayers()) do 
+        if string.sub(string.lower(p.Name), 1, string.len(v)) == string.lower(v) and p.Character then 
+            LocalPlayer.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame return 
+        end 
+    end 
+end })
+
+V6Tab:CreateInput({ Name = "14. Đổi Giờ Trong Game (0-24)", PlaceholderText = "12", Callback = function(v) Lighting.TimeOfDay = tostring(v) .. ":00:00" end })
+V6Tab:CreateToggle({ Name = "15. Luôn luôn là Ban Ngày", Callback = function(v) _G.AlwaysDay = v end })
+V6Tab:CreateToggle({ Name = "16. Tắt toàn bộ bóng râm (Disable Shadows)", Callback = function(v) Lighting.GlobalShadows = not v end })
+V6Tab:CreateToggle({ Name = "17. Anti-Void (Tự TP về Spawn khi rơi)", Callback = function(v) _G.AntiVoid = v end })
+V6Tab:CreateToggle({ Name = "18. Cầu thang tàng hình (Walk on Air)", Callback = function(v) _G.AirWalk = v end })
+V6Tab:CreateToggle({ Name = "19. Tự động Click chuột trái (Native)", Callback = function(v) _G.NativeAutoClick = v end })
+V6Tab:CreateToggle({ Name = "20. Mở khóa Max Camera Zoom", Callback = function(v) 
+    _G.CamMaxZoom = v if v then LocalPlayer.CameraMaxZoomDistance = 10000 else LocalPlayer.CameraMaxZoomDistance = 128 end 
+end })
+
+-- 5. VISUALS TAB
+local VisualTab = Window:CreateTab("Visuals", "eye")
+VisualTab:CreateToggle({ Name = "ESP Players (Rainbow + Name)", Callback = function(v) _G.ESP = v if not v then ClearESP() end end })
+VisualTab:CreateToggle({ Name = "Mờ nhân vật bản thân (Ghost Visual)", Callback = function(v) 
+    _G.GhostVisual = v 
+    if not v and LocalPlayer.Character and not _G.Invisible then
+        for _, p in pairs(LocalPlayer.Character:GetDescendants()) do if (p:IsA("BasePart") and p.Name ~= "HumanoidRootPart") or p:IsA("Decal") then p.Transparency = 0 end end
+    end
+end })
+VisualTab:CreateToggle({ Name = "Full Bright", Callback = function(v) Lighting.Brightness = v and 2 or 1 end })
+VisualTab:CreateToggle({ Name = "No Fog", Callback = function(v) _G.NoFog = v Lighting.FogEnd = v and 100000 or 1000 end })
+VisualTab:CreateToggle({ Name = "XRay", Callback = function(v) _G.XRay = v RefreshXRay() end })
+VisualTab:CreateToggle({ Name = "FOV Changer (120)", Callback = function(v) _G.FOV = v workspace.CurrentCamera.FieldOfView = v and 120 or 70 end })
+
+-- 6. COMBAT TAB
+local CombatTab = Window:CreateTab("Combat", "swords")
+CombatTab:CreateButton({ Name = "Load Aim/Lock", Callback = function() pcall(function() loadstring(game:HttpGet("https://pastefy.app/YiGY38uo/raw"))() end) end })
+
+-- 7. AUTO FARM TAB
+local FarmTab = Window:CreateTab("Auto Farm", "tractor")
+FarmTab:CreateToggle({ Name = "Auto Follow Players", Callback = function(v) _G.FollowPlayer = v end })
+local PlayerDropdown = FarmTab:CreateDropdown({
+    Name = "Chọn mục tiêu Người chơi", Options = {"None"}, CurrentOption = "None", MultipleOptions = false,
+    Callback = function(Option) if type(Option) == "table" then _G.TargetPlayer = Option[1] else _G.TargetPlayer = Option end end,
+})
+FarmTab:CreateButton({ Name = "🔄 Làm mới danh sách người chơi", Callback = function() local list = {"None"} for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer then table.insert(list, p.Name) end end PlayerDropdown:Refresh(list, true) end })
+FarmTab:CreateDropdown({ Name = "Vị trí Follow Player", Options = {"Behind", "Above", "Under", "Orbit Target"}, CurrentOption = "Behind", MultipleOptions = false, Callback =
