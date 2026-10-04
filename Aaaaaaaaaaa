@@ -1,0 +1,376 @@
+-- ====================================================
+-- HKT ADMIN GUI - FULL RGB RAINBOW EDITION (7 FEATURES)
+-- Features: Fix Lag, ESP, Aim Head, Fly, Spin, Aimkill, Teleport, Rainbow Border & Title
+-- ====================================================
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- Xóa GUI cũ nếu đã tồn tại tránh bị trùng lặp
+if game.CoreGui:FindFirstChild("HKT_AdminGui") then
+    game.CoreGui.HKT_AdminGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HKT_AdminGui"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Nút Bật/Tắt Menu (Floating Toggle Button - Bo tròn hoàn hảo & Sắc nét)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
+ToggleBtn.Position = UDim2.new(0, 20, 0, 100)
+ToggleBtn.Size = UDim2.new(0, 54, 0, 54)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "HKT"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextSize = 13
+ToggleBtn.AutoButtonColor = false
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleBtn
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(255, 255, 255)
+ToggleStroke.Thickness = 2.5
+ToggleStroke.Parent = ToggleBtn
+
+-- Khung Menu Chính (Main Frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -230)
+MainFrame.Size = UDim2.new(0, 350, 0, 470)
+MainFrame.Visible = false
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(255, 255, 255)
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
+
+-- Tiêu đề Header
+local Header = Instance.new("Frame")
+Header.Name = "Header"
+Header.Parent = MainFrame
+Header.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+Header.Size = UDim2.new(1, 0, 0, 45)
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 12)
+HeaderCorner.Parent = Header
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = Header
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+TitleLabel.Size = UDim2.new(1, -30, 1, 0)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Text = "⚡ HKT ADMIN PANEL ⚡"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 15
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Hiệu ứng đổi màu 7 màu (RGB Rainbow Loop) cho Viền menu, Nút tròn VÀ Chữ tiêu đề HKT ADMIN PANEL
+RunService.RenderStepped:Connect(function(dt)
+    local hue = (tick() * 0.25) % 1
+    local rainbowColor = Color3.fromHSV(hue, 1, 1)
+    MainStroke.Color = rainbowColor
+    ToggleStroke.Color = rainbowColor
+    TitleLabel.TextColor3 = rainbowColor
+end)
+
+-- Khu vực chứa danh sách tính năng (ScrollingFrame)
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundTransparency = 1
+Container.Position = UDim2.new(0, 10, 0, 55)
+Container.Size = UDim2.new(1, -20, 1, -65)
+Container.CanvasSize = UDim2.new(0, 0, 0, 430)
+Container.ScrollBarThickness = 4
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+-- Logic ẩn/hiện Menu kèm hiệu ứng xoay mượt mà
+local isOpen = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    isOpen = not isOpen
+    MainFrame.Visible = isOpen
+    TweenService:Create(ToggleBtn, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Rotation = isOpen and 360 or 0}):Play()
+end)
+
+ToggleBtn.MouseEnter:Connect(function()
+    TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {Size = UDim2.new(0, 58, 0, 58)}):Play()
+end)
+ToggleBtn.MouseLeave:Connect(function()
+    TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {Size = UDim2.new(0, 54, 0, 54)}):Play()
+end)
+
+-- Hàm tạo nút bấm tính năng
+local function createButton(name, order)
+    local btn = Instance.new("TextButton")
+    btn.Name = name .. "Btn"
+    btn.Parent = Container
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+    btn.Size = UDim2.new(1, -10, 0, 42)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.Text = "   " .. name
+    btn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    btn.TextSize = 14
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.LayoutOrder = order
+    btn.AutoButtonColor = false
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(40, 40, 60)
+    stroke.Thickness = 1
+    stroke.Parent = btn
+
+    local dot = Instance.new("Frame")
+    dot.Name = "StatusDot"
+    dot.Parent = btn
+    dot.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+    dot.Position = UDim2.new(1, -30, 0.5, -6)
+    dot.Size = UDim2.new(0, 12, 0, 12)
+    
+    local dotCorner = Instance.new("UICorner")
+    dotCorner.CornerRadius = UDim.new(1, 0)
+    dotCorner.Parent = dot
+
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 45)}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.2), {Color3 = Color3.fromRGB(255, 255, 255)}):Play()
+    end)
+
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 20, 28)}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.2), {Color3 = Color3.fromRGB(40, 40, 60)}):Play()
+    end)
+
+    return btn, dot
+end
+
+-- ==================== TÍNH NĂNG ====================
+
+-- 1. FIX LAG
+local fixLagBtn, fixLagDot = createButton("Fix Lag (Boost FPS)", 1)
+local fixLagActive = false
+fixLagBtn.MouseButton1Click:Connect(function()
+    fixLagActive = not fixLagActive
+    fixLagDot.BackgroundColor3 = fixLagActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+    
+    if fixLagActive then
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Part") or v:IsA("MeshPart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
+            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") then
+                v.Enabled = false
+            end
+        end
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+    end
+end)
+
+-- 2. ESP NGƯỜI CHƠI
+local espBtn, espDot = createButton("ESP Player (Highlight)", 2)
+local espActive = false
+local espHighlights = {}
+espBtn.MouseButton1Click:Connect(function()
+    espActive = not espActive
+    espDot.BackgroundColor3 = espActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+    
+    if espActive then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "HKT_ESP"
+                highlight.Adornee = player.Character
+                highlight.FillColor = Color3.fromRGB(255, 50, 50)
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                highlight.FillTransparency = 0.5
+                highlight.Parent = player.Character
+                table.insert(espHighlights, highlight)
+            end
+        end
+    else
+        for _, h in pairs(espHighlights) do
+            if h then h:Destroy() end
+        end
+        espHighlights = {}
+    end
+end)
+
+-- 3. AIM ĐẦU (AimHead / Lock Head)
+local aimBtn, aimDot = createButton("Aim Head (Lock Head)", 3)
+local aimActive = false
+aimBtn.MouseButton1Click:Connect(function()
+    aimActive = not aimActive
+    aimDot.BackgroundColor3 = aimActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+end)
+
+-- 4. FLY (Bay)
+local flyBtn, flyDot = createButton("Fly Mode", 4)
+local flyActive = false
+local bodyGyro, bodyVelocity
+flyBtn.MouseButton1Click:Connect(function()
+    flyActive = not flyActive
+    flyDot.BackgroundColor3 = flyActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+    
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local root = char.HumanoidRootPart
+    
+    if flyActive then
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = root.CFrame
+        bodyGyro.Parent = root
+        
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bodyVelocity.Parent = root
+        
+        task.spawn(function()
+            while flyActive and char and root and bodyVelocity do
+                local camera = workspace.CurrentCamera
+                local moveDir = Vector3.new(0, 0, 0)
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
+                bodyVelocity.Velocity = moveDir * 50
+                bodyGyro.CFrame = camera.CFrame
+                task.wait()
+            end
+        end)
+    else
+        if bodyGyro then bodyGyro:Destroy() end
+        if bodyVelocity then bodyVelocity:Destroy() end
+    end
+end)
+
+-- 5. SPIN (Quay vòng vòng)
+local spinBtn, spinDot = createButton("Spin Character", 5)
+local spinActive = false
+local spinAnim = nil
+spinBtn.MouseButton1Click:Connect(function()
+    spinActive = not spinActive
+    spinDot.BackgroundColor3 = spinActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+    
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local root = char.HumanoidRootPart
+    
+    if spinActive then
+        spinAnim = RunService.RenderStepped:Connect(function()
+            if root then
+                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(30), 0)
+            end
+        end)
+    else
+        if spinAnim then spinAnim:Disconnect() end
+    end
+end)
+
+-- 6. AIMKILL (Khóa đầu tự động + Tự động tấn công vũ khí)
+local aimkillBtn, aimkillDot = createButton("Aimkill (Auto Attack)", 6)
+local aimkillActive = false
+aimkillBtn.MouseButton1Click:Connect(function()
+    aimkillActive = not aimkillActive
+    aimkillDot.BackgroundColor3 = aimkillActive and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(120, 120, 120)
+end)
+
+-- 7. TELEPORT (Dịch chuyển tức thời đến sau lưng người chơi gần nhất)
+local tpBtn, tpDot = createButton("Teleport (To Nearest)", 7)
+tpBtn.MouseButton1Click:Connect(function()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local root = char.HumanoidRootPart
+    
+    local closestPlayer = nil
+    local shortestDist = math.huge
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local targetRoot = player.Character.HumanoidRootPart
+            local hum = player.Character:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                local dist = (root.Position - targetRoot.Position).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    closestPlayer = player.Character
+                end
+            end
+        end
+    end
+    
+    if closestPlayer and closestPlayer:FindFirstChild("HumanoidRootPart") then
+        root.CFrame = closestPlayer.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+        tpDot.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+        task.wait(0.3)
+        tpDot.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+    end
+end)
+
+-- Vòng lặp xử lý Aim Head & Aimkill chung
+RunService.RenderStepped:Connect(function()
+    local camera = workspace.CurrentCamera
+    
+    if aimActive or aimkillActive then
+        local closestPlayer = nil
+        local shortestDist = math.huge
+        
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                local char = player.Character
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    local head = char.Head
+                    local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local mousePos = UserInputService:GetMouseLocation()
+                        local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                        if dist < shortestDist then
+                            shortestDist = dist
+                            closestPlayer = head
+                        end
+                    end
+                end
+            end
+        end
+        
+        if closestPlayer then
+            camera.CFrame = CFrame.new(camera.CFrame.Position, closestPlayer.Position)
+            
+            if aimkillActive and LocalPlayer.Character then
+                local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+                if tool then
+                    pcall(function()
+                        tool:Activate()
+                    end)
+                end
+            end
+        end
+    end
+end)
